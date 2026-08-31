@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post a Vacancy | Premium Job Board</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Base & Animated Background */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(-45deg, #4facfe, #00f2fe, #f093fb, #f5576c);
+            background-size: 400% 400%; animation: gradientBG 15s ease infinite;
+            color: #fff; overflow-x: hidden; display: flex; flex-direction: column;
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Top Navigation Bar */
+        nav {
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 20px 40px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .nav-logo { font-size: 1.5rem; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .nav-links a {
+            color: #fff; text-decoration: none; font-weight: 500;
+            background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; transition: all 0.3s;
+        }
+        .nav-links a:hover { background: #fff; color: #1a1a2e; }
+
+        /* Form Container */
+        .form-container {
+            flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 20px;
+        }
+        .glass-form {
+            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 24px;
+            padding: 40px; max-width: 800px; width: 100%;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+        }
+        .glass-form h2 { font-size: 2rem; margin-bottom: 5px; }
+        .glass-form p.subtitle { opacity: 0.9; margin-bottom: 30px; font-size: 0.95rem; }
+
+        /* Form Grid Layout */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .full-width { grid-column: span 2; }
+
+        /* Inputs & Textareas */
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.95rem; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 12px 15px; border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.1); color: #fff;
+            font-size: 1rem; outline: none; transition: all 0.3s ease;
+        }
+        .form-group input::placeholder, .form-group textarea::placeholder { color: rgba(255, 255, 255, 0.7); }
+        .form-group select option { background: #1a1a2e; color: #fff; } /* Select options need solid bg */
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { 
+            border-color: #fff; background: rgba(255, 255, 255, 0.25); 
+        }
+        .form-group textarea { resize: vertical; min-height: 120px; }
+
+        /* Premium Fee Banner */
+        .premium-banner {
+            background: rgba(0, 0, 0, 0.2); border-left: 4px solid #f093fb;
+            padding: 15px; border-radius: 8px; margin: 25px 0; font-size: 0.9rem; line-height: 1.5;
+        }
+        .premium-banner strong { color: #f093fb; }
+
+        /* Submit Button */
+        .submit-btn {
+            width: 100%; padding: 15px; font-size: 1.1rem; font-weight: 600;
+            border-radius: 12px; border: none; cursor: pointer; transition: all 0.3s ease;
+            background-color: #1a1a2e; color: #ffffff; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .submit-btn:hover { background-color: #ffffff; color: #1a1a2e; transform: translateY(-3px); }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 600px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .full-width { grid-column: span 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-logo">PremiumTalent</div>
+        <div class="nav-links">
+            <a href="employer-dashboard.html">Back to Dashboard</a>
+        </div>
+    </nav>
+
+    <!-- Post Vacancy Form -->
+    <div class="form-container">
+        <div class="glass-form">
+            <h2>Post a New Vacancy</h2>
+            <p class="subtitle">Reach the best verified talent directly. Listings stay active for 30 days.</p>
+
+            <form id="vacancy-form">
+                <div class="form-grid">
+                    
+                    <div class="form-group">
+                        <label for="jobTitle">Job Title</label>
+                        <input type="text" id="jobTitle" placeholder="e.g. Senior Frontend Developer" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="jobCategory">Category</label>
+                        <select id="jobCategory" required>
+                            <option value="" disabled selected>Select a category...</option>
+                            <option value="tech">Technology & Software</option>
+                            <option value="marketing">Marketing & Sales</option>
+                            <option value="finance">Finance & Accounting</option>
+                            <option value="design">Design & Creative</option>
+                            <option value="admin">Operations & Admin</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="jobLocation">Location</label>
+                        <select id="jobLocation" required>
+                            <option value="" disabled selected>Select location...</option>
+                            <option value="bulawayo">Bulawayo, Zimbabwe</option>
+                            <option value="harare">Harare, Zimbabwe</option>
+                            <option value="remote">Fully Remote</option>
+                            <option value="hybrid">Hybrid</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="jobSalary">Salary Range (Optional)</label>
+                        <input type="text" id="jobSalary" placeholder="e.g. $1,000 - $1,500 / month">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="jobDescription">Job Description</label>
+                        <textarea id="jobDescription" placeholder="Describe the day-to-day responsibilities and what the role entails..." required></textarea>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="jobRequirements">Key Qualifications & Requirements</label>
+                        <textarea id="jobRequirements" placeholder="List the required degrees, years of experience, or specific skills needed..." required></textarea>
+                    </div>
+
+                </div>
+
+                <div class="premium-banner">
+                    <strong>Standard Listing Fee: $20 USD.</strong> Includes 30 days on the main board and a feature in our weekly candidate newsletter.
+                </div>
+
+                <button type="submit" class="submit-btn">Pay $20 & Post Vacancy</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT FOR FORM SUBMISSION -->
+    <script>
+        document.getElementById('vacancy-form').addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevents the page from reloading instantly
+
+            // In a real application, this is where you would connect to Paynow/EcoCash.
+            // For now, we simulate a successful payment and post.
+            
+            const submitBtn = document.querySelector('.submit-btn');
+            submitBtn.innerText = "Processing Payment...";
+            submitBtn.style.opacity = "0.8";
+
+            setTimeout(() => {
+                alert("✅ Payment successful! Your job vacancy is now live on the board.");
+                window.location.href = "employer-dashboard.html"; // Redirect back to dashboard
+            }, 1500); // 1.5 second delay to simulate processing
+        });
+    </script>
+</body>
+</html>

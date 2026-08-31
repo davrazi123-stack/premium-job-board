@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account | Premium Job Board</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Base Styles & Animated Background */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body {
+            min-height: 100vh; width: 100vw; display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(-45deg, #4facfe, #00f2fe, #f093fb, #f5576c);
+            background-size: 400% 400%; animation: gradientBG 15s ease infinite; padding: 40px 20px;
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Glassmorphism Form Container */
+        .auth-card {
+            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 24px; 
+            padding: 40px; max-width: 600px; width: 100%;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2); color: #ffffff;
+        }
+
+        .auth-card h2 { text-align: center; font-size: 2rem; margin-bottom: 5px; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .auth-card p.subtitle { text-align: center; font-size: 0.95rem; margin-bottom: 30px; opacity: 0.9; }
+
+        /* Form Grid for Seeker Layout */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .full-width { grid-column: span 2; }
+
+        /* Form Elements */
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.95rem; }
+        .form-group input, .form-group textarea {
+            width: 100%; padding: 12px 15px; border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.1); color: #fff;
+            font-size: 1rem; outline: none; transition: all 0.3s ease;
+        }
+        .form-group input::placeholder, .form-group textarea::placeholder { color: rgba(255, 255, 255, 0.7); }
+        .form-group input:focus, .form-group textarea:focus { border-color: #fff; background: rgba(255, 255, 255, 0.25); }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+
+        /* Custom File Upload Styling for Seekers */
+        .file-upload-wrapper {
+            display: flex; align-items: center; gap: 15px;
+            background: rgba(255, 255, 255, 0.1); border: 2px dashed rgba(255, 255, 255, 0.4);
+            border-radius: 12px; padding: 15px; transition: all 0.3s ease;
+        }
+        .file-upload-wrapper input[type="file"] { display: none; }
+        
+        .upload-btn {
+            background: #ffffff; color: #1a1a2e; padding: 8px 15px;
+            border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s; font-size: 0.9rem;
+        }
+        
+        .image-preview {
+            width: 60px; height: 60px; border-radius: 12px; background: rgba(0,0,0,0.2);
+            display: flex; align-items: center; justify-content: center; overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.3); font-size: 0.75rem; text-align: center; color: rgba(255,255,255,0.6);
+        }
+        .image-preview img { width: 100%; height: 100%; object-fit: cover; display: none; }
+
+        /* Submit Button */
+        .submit-btn {
+            width: 100%; padding: 15px; font-size: 1.1rem; font-weight: 600; margin-top: 10px;
+            border-radius: 12px; border: none; cursor: pointer; transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .btn-employer { background-color: #1a1a2e; color: #ffffff; }
+        .btn-employer:hover { background-color: #ffffff; color: #1a1a2e; transform: translateY(-2px); }
+        .btn-seeker { background-color: #ffffff; color: #f5576c; }
+        .btn-seeker:hover { background-color: transparent; border: 2px solid #ffffff; color: #ffffff; transform: translateY(-2px); }
+
+        #employer-form, #seeker-form { display: none; }
+
+        .login-link { text-align: center; margin-top: 25px; font-size: 0.9rem; }
+        .login-link a { color: #fff; font-weight: 600; text-decoration: none; border-bottom: 1px solid transparent; transition: border 0.3s; }
+        .login-link a:hover { border-bottom: 1px solid #fff; }
+
+        @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } .full-width { grid-column: span 1; } }
+    </style>
+</head>
+<body>
+
+    <div class="auth-card">
+        <h2 id="form-title">Create Account</h2>
+        <p class="subtitle" id="form-subtitle">Free to join. Free to browse.</p>
+
+        <!-- EMPLOYER SIGNUP FORM (Simple) -->
+        <form id="employer-form" action="employer-dashboard.html">
+            <div class="form-group">
+                <label>Company Name</label>
+                <input type="text" placeholder="e.g. Acme Corp" required>
+            </div>
+            <div class="form-group">
+                <label>Work Email</label>
+                <input type="email" placeholder="hr@company.com" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" placeholder="Create a strong password" required>
+            </div>
+            <button type="submit" class="submit-btn btn-employer">Create Free Employer Account</button>
+        </form>
+
+        <!-- JOB SEEKER SIGNUP FORM (Comprehensive for 1-Click Apply) -->
+        <form id="seeker-form" action="seeker-dashboard.html">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" placeholder="John Doe" required>
+                </div>
+                <div class="form-group">
+                    <label>Age</label>
+                    <input type="number" placeholder="e.g. 25" min="18" max="80" required>
+                </div>
+                
+                <div class="form-group full-width">
+                    <label>Email Address</label>
+                    <input type="email" placeholder="you@example.com" required>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Password</label>
+                    <input type="password" placeholder="Create a strong password" required>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Passport Size Photo (For your 1-Click Profile)</label>
+                    <div class="file-upload-wrapper">
+                        <div class="image-preview">
+                            <span id="preview-text">No Photo</span>
+                            <img id="photo-preview" src="" alt="Preview">
+                        </div>
+                        <div>
+                            <label for="appPhoto" class="upload-btn">Upload Image</label>
+                            <input type="file" id="appPhoto" accept="image/*" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Qualifications & Experience</label>
+                    <textarea placeholder="Detail your degrees and skills here. This is what employers will see when you apply." required></textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn btn-seeker">Save Profile & Start Browsing</button>
+        </form>
+
+        <div class="login-link">
+            Already have an account? <a href="login.html">Log in here</a>
+        </div>
+    </div>
+
+    <script>
+        // Form Routing Logic
+        const urlParams = new URLSearchParams(window.location.search);
+        const userType = urlParams.get('type');
+        const formTitle = document.getElementById('form-title');
+
+        if (userType === 'employer') {
+            document.getElementById('employer-form').style.display = 'block';
+            formTitle.innerText = "Hire Top Talent";
+        } else {
+            document.getElementById('seeker-form').style.display = 'block';
+            formTitle.innerText = "Build Your Profile";
+        }
+
+        // Instant Photo Preview Logic for Seekers
+        document.getElementById('appPhoto').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('photo-preview').src = e.target.result;
+                    document.getElementById('photo-preview').style.display = 'block';
+                    document.getElementById('preview-text').style.display = 'none';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+</html>

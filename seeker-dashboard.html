@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Jobs | Premium Job Board</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Base & Animated Background */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(-45deg, #4facfe, #00f2fe, #f093fb, #f5576c);
+            background-size: 400% 400%; animation: gradientBG 15s ease infinite;
+            color: #fff; overflow-x: hidden;
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Top Navigation Bar */
+        nav {
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 20px 40px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .nav-logo { font-size: 1.5rem; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .nav-links { display: flex; align-items: center; gap: 20px; }
+        .nav-links span { font-weight: 500; opacity: 0.9; }
+        .nav-links a {
+            color: #fff; text-decoration: none; font-weight: 500;
+            background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; transition: all 0.3s;
+        }
+        .nav-links a:hover { background: #fff; color: #f5576c; }
+
+        /* Dashboard Container */
+        .dashboard-container { padding: 40px; max-width: 1000px; margin: 0 auto; }
+        
+        /* Search & Filter Bar */
+        .search-bar {
+            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 16px;
+            padding: 20px; margin-bottom: 40px;
+            display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 15px; align-items: center;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+        }
+        .search-bar input, .search-bar select {
+            width: 100%; padding: 12px 15px; border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.1); color: #fff; font-size: 1rem; outline: none;
+        }
+        .search-bar input::placeholder { color: rgba(255, 255, 255, 0.7); }
+        .search-bar select option { background: #1a1a2e; color: #fff; }
+        .btn-search {
+            padding: 12px 25px; border-radius: 12px; font-size: 1rem; font-weight: 600;
+            background: #ffffff; color: #f5576c; border: none; cursor: pointer; transition: all 0.3s ease;
+        }
+        .btn-search:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(255,255,255,0.4); }
+
+        /* Job List & Cards */
+        .job-list { display: flex; flex-direction: column; gap: 20px; }
+        .job-card {
+            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 16px;
+            padding: 25px; display: flex; justify-content: space-between; align-items: center;
+            transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .job-card:hover { transform: translateY(-3px); background: rgba(255, 255, 255, 0.25); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2); }
+        
+        .job-info h3 { font-size: 1.4rem; margin-bottom: 5px; }
+        .job-info .company-name { font-size: 1rem; font-weight: 500; opacity: 0.9; margin-bottom: 10px; }
+        
+        .job-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+        .tag { background: rgba(255, 255, 255, 0.2); padding: 4px 12px; border-radius: 12px; font-size: 0.85rem; font-weight: 500; }
+        .tag.remote { background: rgba(0, 242, 254, 0.3); }
+        .job-salary { font-size: 0.95rem; opacity: 0.9; font-weight: 500; }
+
+        /* 1-Click Apply Button */
+        .btn-apply {
+            padding: 12px 30px; border-radius: 12px; font-size: 1rem; font-weight: 600;
+            background: #1a1a2e; color: #fff; border: none; cursor: pointer; transition: all 0.3s;
+        }
+        .btn-apply:hover { background: #fff; color: #1a1a2e; box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3); }
+
+        /* ================= PAYWALL MODAL ================= */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px);
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease; z-index: 1000;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 24px;
+            padding: 40px; max-width: 450px; width: 90%; position: relative; text-align: center;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3); transform: translateY(20px); transition: transform 0.3s ease;
+        }
+        .modal-overlay.active .modal-content { transform: translateY(0); }
+
+        .close-btn { position: absolute; top: 20px; right: 25px; font-size: 1.5rem; cursor: pointer; opacity: 0.7; }
+        .close-btn:hover { opacity: 1; }
+
+        .modal-content h2 { font-size: 1.8rem; margin-bottom: 10px; }
+        .modal-content p { font-size: 0.95rem; opacity: 0.9; margin-bottom: 25px; line-height: 1.5; }
+        
+        .price-tag { font-size: 2.5rem; font-weight: 700; color: #00f2fe; margin-bottom: 25px; }
+        .price-tag span { font-size: 1rem; font-weight: 400; color: #fff; opacity: 0.8; }
+
+        /* Payment Methods */
+        .payment-methods { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
+        .pay-method-btn {
+            padding: 12px; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.4); background: rgba(255,255,255,0.1); color: #fff; transition: all 0.3s;
+            display: flex; justify-content: center; align-items: center; gap: 10px;
+        }
+        .pay-method-btn:hover, .pay-method-btn.selected {
+            background: #fff; color: #1a1a2e; border-color: #fff;
+        }
+
+        .btn-checkout {
+            width: 100%; padding: 15px; border-radius: 12px; font-size: 1.1rem; font-weight: 700;
+            background: #f5576c; color: #fff; border: none; cursor: pointer; transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+        }
+        .btn-checkout:hover { background: #ff758c; transform: translateY(-2px); }
+
+        /* Success Toast */
+        .toast {
+            position: fixed; bottom: 30px; right: 30px; background: #00f2fe; color: #1a1a2e;
+            padding: 15px 25px; border-radius: 12px; font-weight: 600; box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateY(100px); opacity: 0; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); z-index: 2000;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+
+        @media (max-width: 768px) {
+            .search-bar { grid-template-columns: 1fr; }
+            .job-card { flex-direction: column; align-items: flex-start; gap: 20px; }
+            .btn-apply { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-logo">PremiumTalent</div>
+        <div class="nav-links">
+            <span id="sub-status">Status: Free Tier</span>
+            <a href="index.html">Logout</a>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        
+        <div class="search-bar">
+            <input type="text" placeholder="Job title, keywords, or company...">
+            <select><option>All Locations</option><option>Bulawayo</option><option>Harare</option><option>Remote</option></select>
+            <select><option>All Categories</option><option>Tech & Software</option><option>Marketing</option></select>
+            <button class="btn-search">Search</button>
+        </div>
+
+        <div class="job-list">
+            <!-- Job Card 1 -->
+            <div class="job-card">
+                <div class="job-info">
+                    <h3>Senior Frontend Developer</h3>
+                    <div class="company-name">Acme Corp</div>
+                    <div class="job-tags"><span class="tag">Full-Time</span><span class="tag remote">Remote</span></div>
+                    <div class="job-salary">$1,200 - $1,800 / month</div>
+                </div>
+                <!-- Notice the onclick function passing the job details -->
+                <button class="btn-apply" onclick="attemptApply('Senior Frontend Developer', 'Acme Corp')">1-Click Apply</button>
+            </div>
+
+            <!-- Job Card 2 -->
+            <div class="job-card">
+                <div class="job-info">
+                    <h3>Digital Marketing Specialist</h3>
+                    <div class="company-name">ZimMedia Agencies</div>
+                    <div class="job-tags"><span class="tag">Contract</span><span class="tag">Bulawayo</span></div>
+                    <div class="job-salary">$800 - $1,000 / month</div>
+                </div>
+                <button class="btn-apply" onclick="attemptApply('Digital Marketing Specialist', 'ZimMedia Agencies')">1-Click Apply</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- The Paywall Modal -->
+    <div class="modal-overlay" id="paywall-modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2>Unlock 1-Click Apply</h2>
+            <p>Your complete profile (photo & qualifications) is ready. Subscribe to send unlimited applications directly to employers for 30 days.</p>
+            
+            <div class="price-tag">$5 <span>/ month</span></div>
+
+            <div class="payment-methods">
+                <button class="pay-method-btn" onclick="selectPayment(this)">🟢 EcoCash / Inbucks</button>
+                <button class="pay-method-btn" onclick="selectPayment(this)">💳 Visa / Mastercard (PayPal)</button>
+            </div>
+
+            <button class="btn-checkout" onclick="processPayment()">Pay & Submit Application</button>
+        </div>
+    </div>
+
+    <!-- Success Toast Notification -->
+    <div class="toast" id="success-toast">✅ Application sent successfully!</div>
+
+    <script>
+        // 1. Subscription State (Simulating a database check)
+        let hasActiveSubscription = false; 
+        let pendingJob = "";
+        let pendingCompany = "";
+
+        // 2. The 1-Click Apply Logic
+        function attemptApply(jobTitle, companyName) {
+            if (hasActiveSubscription) {
+                // If they already paid this month, it sends instantly
+                showToast(`Profile sent to ${companyName} for ${jobTitle}!`);
+            } else {
+                // If they haven't paid, open the paywall and remember what they clicked
+                pendingJob = jobTitle;
+                pendingCompany = companyName;
+                document.getElementById('paywall-modal').classList.add('active');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('paywall-modal').classList.remove('active');
+        }
+
+        // 3. UI for selecting a payment method
+        function selectPayment(btn) {
+            // Remove 'selected' class from all buttons, add to the clicked one
+            document.querySelectorAll('.pay-method-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        }
+
+        // 4. Processing the Payment (Simulated Paynow Gateway)
+        function processPayment() {
+            const checkoutBtn = document.querySelector('.btn-checkout');
+            checkoutBtn.innerText = "Processing via Paynow...";
+            checkoutBtn.style.opacity = "0.8";
+
+            setTimeout(() => {
+                // Payment Success!
+                hasActiveSubscription = true; // They are now subscribed for the month
+                
+                // Update UI to show they are premium
+                document.getElementById('sub-status').innerText = "Status: Premium (30 Days Left)";
+                document.getElementById('sub-status').style.color = "#00f2fe";
+
+                // Close modal and reset button
+                closeModal();
+                checkoutBtn.innerText = "Pay & Submit Application";
+                checkoutBtn.style.opacity = "1";
+
+                // Automatically submit the application they were trying to send
+                showToast(`Payment successful! Profile sent to ${pendingCompany}.`);
+            }, 1500);
+        }
+
+        // 5. Toast Notification System
+        function showToast(message) {
+            const toast = document.getElementById('success-toast');
+            toast.innerText = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3500); // Hide after 3.5 seconds
+        }
+    </script>
+</body>
+</html>

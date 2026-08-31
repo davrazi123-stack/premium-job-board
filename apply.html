@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Application | Premium Job Board</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Base & Animated Background */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(-45deg, #4facfe, #00f2fe, #f093fb, #f5576c);
+            background-size: 400% 400%; animation: gradientBG 15s ease infinite;
+            color: #fff; overflow-x: hidden; display: flex; flex-direction: column;
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Top Navigation Bar */
+        nav {
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 20px 40px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .nav-logo { font-size: 1.5rem; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .nav-links a {
+            color: #fff; text-decoration: none; font-weight: 500;
+            background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; transition: all 0.3s;
+        }
+        .nav-links a:hover { background: #fff; color: #1a1a2e; }
+
+        /* Form Container */
+        .form-container {
+            flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 20px;
+        }
+        .glass-form {
+            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 24px;
+            padding: 40px; max-width: 650px; width: 100%;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+        }
+        
+        .glass-form h2 { font-size: 1.8rem; margin-bottom: 5px; line-height: 1.2; }
+        .glass-form p.subtitle { opacity: 0.9; margin-bottom: 30px; font-size: 0.95rem; }
+        .highlight { color: #00f2fe; font-weight: 600; }
+
+        /* Form Grid */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .full-width { grid-column: span 2; }
+
+        /* Inputs */
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.95rem; }
+        .form-group input, .form-group textarea {
+            width: 100%; padding: 12px 15px; border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.1); color: #fff;
+            font-size: 1rem; outline: none; transition: all 0.3s ease;
+        }
+        .form-group input::placeholder, .form-group textarea::placeholder { color: rgba(255, 255, 255, 0.7); }
+        .form-group input:focus, .form-group textarea:focus { border-color: #fff; background: rgba(255, 255, 255, 0.25); }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+
+        /* Custom File Upload Styling */
+        .file-upload-wrapper {
+            display: flex; align-items: center; gap: 20px;
+            background: rgba(255, 255, 255, 0.1); border: 2px dashed rgba(255, 255, 255, 0.4);
+            border-radius: 12px; padding: 20px; transition: all 0.3s ease;
+        }
+        .file-upload-wrapper:hover { border-color: #fff; background: rgba(255, 255, 255, 0.2); }
+        
+        .file-upload-wrapper input[type="file"] { display: none; }
+        
+        .upload-btn {
+            background: #ffffff; color: #1a1a2e; padding: 10px 20px;
+            border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s;
+        }
+        .upload-btn:hover { box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3); transform: translateY(-2px); }
+        
+        /* Image Preview Box */
+        .image-preview {
+            width: 70px; height: 70px; border-radius: 12px; background: rgba(0,0,0,0.2);
+            display: flex; align-items: center; justify-content: center; overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.3); font-size: 0.8rem; text-align: center; color: rgba(255,255,255,0.6);
+        }
+        .image-preview img { width: 100%; height: 100%; object-fit: cover; display: none; }
+
+        /* Submit Button */
+        .submit-btn {
+            width: 100%; padding: 15px; font-size: 1.1rem; font-weight: 600; margin-top: 15px;
+            border-radius: 12px; border: none; cursor: pointer; transition: all 0.3s ease;
+            background-color: #1a1a2e; color: #ffffff; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .submit-btn:hover { background-color: #ffffff; color: #1a1a2e; transform: translateY(-3px); }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 600px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .full-width { grid-column: span 1; }
+            .file-upload-wrapper { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-logo">PremiumTalent</div>
+        <div class="nav-links">
+            <a href="seeker-dashboard.html">Back to Jobs</a>
+        </div>
+    </nav>
+
+    <!-- Application Form -->
+    <div class="form-container">
+        <div class="glass-form">
+            <h2 id="dynamic-title">Apply for a Position</h2>
+            <p class="subtitle">Submitting profile directly to <span id="dynamic-company" class="highlight">the employer</span>.</p>
+
+            <form id="apply-form">
+                <div class="form-grid">
+                    
+                    <div class="form-group">
+                        <label for="appName">Full Name</label>
+                        <input type="text" id="appName" placeholder="John Doe" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="appAge">Age</label>
+                        <input type="number" id="appAge" placeholder="e.g. 25" min="18" max="80" required>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="appEmail">Contact Email</label>
+                        <input type="email" id="appEmail" placeholder="you@example.com" required>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>Passport Size Photo</label>
+                        <div class="file-upload-wrapper">
+                            <div class="image-preview" id="preview-container">
+                                <span id="preview-text">No Photo</span>
+                                <img id="photo-preview" src="" alt="Profile Preview">
+                            </div>
+                            <div>
+                                <label for="appPhoto" class="upload-btn">Choose Image</label>
+                                <input type="file" id="appPhoto" accept="image/*" required>
+                                <p style="font-size: 0.8rem; margin-top: 8px; opacity: 0.8;">JPG or PNG. Max size 2MB.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="appQualifications">Qualifications & Experience</label>
+                        <textarea id="appQualifications" placeholder="Briefly detail your degrees, skills, and relevant work experience..." required></textarea>
+                    </div>
+
+                </div>
+
+                <button type="submit" class="submit-btn">Submit Application</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT FOR DYNAMIC URLS & FILE PREVIEW -->
+    <script>
+        // 1. Pull Job Title and Company from the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const jobTitle = urlParams.get('job');
+        const companyName = urlParams.get('company');
+
+        // Update the form headers if the parameters exist
+        if (jobTitle && companyName) {
+            document.getElementById('dynamic-title').innerText = `Apply for ${jobTitle}`;
+            document.getElementById('dynamic-company').innerText = companyName;
+        }
+
+        // 2. Handle Passport Photo Preview instantly
+        const photoInput = document.getElementById('appPhoto');
+        const photoPreview = document.getElementById('photo-preview');
+        const previewText = document.getElementById('preview-text');
+
+        photoInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    photoPreview.src = e.target.result;
+                    photoPreview.style.display = 'block'; // Show the image
+                    previewText.style.display = 'none';   // Hide the "No Photo" text
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // 3. Handle Form Submission
+        document.getElementById('apply-form').addEventListener('submit', function(e) {
+            e.preventDefault(); 
+            
+            const submitBtn = document.querySelector('.submit-btn');
+            submitBtn.innerText = "Sending Profile...";
+            submitBtn.style.opacity = "0.8";
+
+            setTimeout(() => {
+                alert("✅ Success! Your application and photo have been securely sent to the employer.");
+                window.location.href = "seeker-dashboard.html"; // Route back to the job board
+            }, 1200); 
+        });
+    </script>
+</body>
+</html>
