@@ -96,7 +96,7 @@
         .btn-reject:hover { background: #f5576c; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4); }
 
         /* Paywall Modal Specifics */
-        #paywall-modal { z-index: 1050; } /* Sits above the applicant modal */
+        #paywall-modal { z-index: 1050; } 
         #paywall-modal .modal-content { text-align: center; }
         .price-tag { font-size: 2.5rem; font-weight: 700; color: #00f2fe; margin: 20px 0; }
         .price-tag span { font-size: 1rem; font-weight: 400; color: #fff; opacity: 0.8; }
@@ -129,32 +129,20 @@
         <div class="nav-logo">PremiumTalent</div>
         <div class="nav-links">
             <span id="sub-status">Status: Free Tier</span>
-            <a href="index.html">Logout</a>
+            <!-- Logout function handled via script below -->
+            <a href="#" onclick="logoutUser()">Logout</a>
         </div>
     </nav>
 
     <div class="dashboard-container">
-    <div class="dashboard-header">
-        <h1>Welcome back, Acme Corp</h1>
-        <p>Review your recent verified applicants below.</p>
-    </div>
+        <div class="dashboard-header">
+            <h1 id="welcome-message">Welcome back!</h1>
+            <p>Review your recent verified applicants below.</p>
+        </div>
 
-    <!-- This grid is now empty and waiting for real Supabase data -->
-    <div class="applicant-grid" id="applicant-grid">
-        
-    </div>
-</div>
-            </div>
-
-            <div class="tile" onclick="openApplicantModal(this)" data-name="David Ndlovu" data-role="Marketing Manager" data-email="david.ndlovu@example.com" data-age="32" data-photo="https://i.pravatar.cc/150?img=11" data-qualifications="MBA in Marketing. Certified Google Ads Professional.">
-                <img src="https://i.pravatar.cc/150?img=11" alt="Applicant Photo">
-                <h3>David Ndlovu</h3><p>Applied 5 hours ago</p><div class="role-badge">Marketing Manager</div>
-            </div>
+        <!-- The grid is now completely empty, waiting for Supabase data -->
+        <div class="applicant-grid" id="applicant-grid">
             
-            <div class="tile" onclick="openApplicantModal(this)" data-name="Sarah Jenkins" data-role="UX/UI Designer" data-email="s.jenkins@example.com" data-age="25" data-photo="https://i.pravatar.cc/150?img=5" data-qualifications="Portfolio features 12+ mobile apps. Expert in Figma.">
-                <img src="https://i.pravatar.cc/150?img=5" alt="Applicant Photo">
-                <h3>Sarah Jenkins</h3><p>Applied 1 day ago</p><div class="role-badge">UX/UI Designer</div>
-            </div>
         </div>
     </div>
 
@@ -203,13 +191,51 @@
     <!-- Toast Notification -->
     <div class="toast" id="success-toast">Message goes here!</div>
 
+    <!-- Supabase Connection & Core Logic -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // System State
+        // --- 1. INITIALIZE SUPABASE ---
+        // REPLACE THESE WITH YOUR ACTUAL KEYS FROM YOUR SUPABASE DASHBOARD
+        const SUPABASE_URL = 'https://ojpijxcqrfhvwgabkaww.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9qcGlqeGNxcmZodndnYWJrYXd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxNzc5MDgsImV4cCI6MjEwMzc1MzkwOH0.kd0OPR0J8SzbHxibnqTWGlwBjIiDDAutT1KOqvACvRg';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // --- 2. AUTHENTICATION & PROFILE LOADING ---
+        async function loadEmployerData() {
+            // Check if the user is actually logged in
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (session) {
+                // User is logged in, fetch their company name from the profiles table
+                const { data: profile, error } = await supabase
+                    .from('profiles')
+                    .select('company_name')
+                    .eq('id', session.user.id)
+                    .single();
+
+                if (profile && profile.company_name) {
+                    document.getElementById('welcome-message').innerText = `Welcome back, ${profile.company_name}`;
+                }
+            } else {
+                // If they are NOT logged in, redirect them immediately to the login page
+                window.location.href = "login.html";
+            }
+        }
+
+        // Run this function the second the page loads
+        window.onload = loadEmployerData;
+
+        // Logout function
+        async function logoutUser() {
+            await supabase.auth.signOut();
+            window.location.href = "index.html";
+        }
+
+        // --- 3. UI AND PAYWALL LOGIC ---
         let hasActiveSubscription = false; 
         let currentActiveTile = null;
-        let pendingAction = null; // Remembers if they clicked Accept or Reject
+        let pendingAction = null; 
 
-        // Open/Close Applicant Modal
         function openApplicantModal(tile) {
             currentActiveTile = tile;
             document.getElementById('modal-name').innerText = tile.getAttribute('data-name');
@@ -225,13 +251,12 @@
             document.getElementById('applicant-modal').classList.remove('active');
         }
 
-        // Action Logic (Checks Subscription First)
         function handleAction(actionType) {
             if (hasActiveSubscription) {
-                executeAction(actionType); // If paid, skip paywall and send email
+                executeAction(actionType); 
             } else {
-                pendingAction = actionType; // Remember what they wanted to do
-                document.getElementById('paywall-modal').classList.add('active'); // Show Paywall
+                pendingAction = actionType; 
+                document.getElementById('paywall-modal').classList.add('active'); 
             }
         }
 
@@ -244,7 +269,6 @@
             btn.classList.add('selected');
         }
 
-        // Process Payment & Execute Action
         function processPayment() {
             const checkoutBtn = document.querySelector('.btn-checkout');
             checkoutBtn.innerText = "Processing via Paynow...";
@@ -259,12 +283,10 @@
                 checkoutBtn.innerText = "Pay & Proceed";
                 checkoutBtn.style.opacity = "1";
 
-                // Automatically do what they were trying to do before the paywall
                 executeAction(pendingAction);
             }, 1500);
         }
 
-        // The final function that removes the tile and sends the notification
         function executeAction(actionType) {
             const applicantEmail = document.getElementById('modal-email').innerText;
             
@@ -274,7 +296,6 @@
                 showToast(`❌ Rejection email sent to ${applicantEmail}.`);
             }
 
-            // Remove the processed applicant from the dashboard
             if (currentActiveTile) {
                 currentActiveTile.remove();
             }
