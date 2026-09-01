@@ -7,12 +7,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* Base Styles & Animated Background */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body {
-            min-height: 100vh; width: 100vw; display: flex; align-items: center; justify-content: center;
+            min-height: 100vh;
             background: linear-gradient(-45deg, #4facfe, #00f2fe, #f093fb, #f5576c);
-            background-size: 400% 400%; animation: gradientBG 15s ease infinite; padding: 20px;
+            background-size: 400% 400%; animation: gradientBG 15s ease infinite;
+            display: flex; justify-content: center; align-items: center; color: #fff;
         }
         @keyframes gradientBG {
             0% { background-position: 0% 50%; }
@@ -20,72 +20,110 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Glassmorphism Form Container */
-        .auth-card {
-            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 24px; 
-            padding: 40px; max-width: 400px; width: 100%;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2); color: #ffffff;
+        .login-card {
+            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 24px;
+            padding: 40px; max-width: 420px; width: 90%;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3); text-align: center;
         }
+        .login-card h2 { font-size: 2rem; margin-bottom: 5px; }
+        .login-card p { opacity: 0.9; margin-bottom: 25px; font-size: 0.9rem; }
 
-        .auth-card h2 { text-align: center; font-size: 2rem; margin-bottom: 5px; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        .auth-card p.subtitle { text-align: center; font-size: 0.95rem; margin-bottom: 30px; opacity: 0.9; }
-
-        /* Form Elements */
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.95rem; }
-        .form-group input {
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; font-size: 0.85rem; margin-bottom: 8px; font-weight: 500; }
+        .input-group input {
             width: 100%; padding: 12px 15px; border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            background: rgba(255, 255, 255, 0.1); color: #fff;
-            font-size: 1rem; outline: none; transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4);
+            color: #fff; font-size: 1rem; outline: none; transition: all 0.3s;
         }
-        .form-group input::placeholder { color: rgba(255, 255, 255, 0.7); }
-        .form-group input:focus { border-color: #fff; background: rgba(255, 255, 255, 0.25); }
+        .input-group input::placeholder { color: rgba(255, 255, 255, 0.6); }
+        .input-group input:focus { background: rgba(255, 255, 255, 0.3); border-color: #fff; }
 
-        /* Submit Button */
-        .submit-btn {
-            width: 100%; padding: 15px; font-size: 1.1rem; font-weight: 600; margin-top: 10px;
-            border-radius: 12px; border: none; cursor: pointer; transition: all 0.3s ease;
-            background-color: #1a1a2e; color: #ffffff; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        .btn-submit {
+            width: 100%; padding: 14px; border-radius: 12px; font-size: 1rem; font-weight: 600;
+            background: #fff; color: #1a1a2e; border: none; cursor: pointer; transition: all 0.3s; margin-top: 10px;
         }
-        .submit-btn:hover { background-color: #ffffff; color: #1a1a2e; transform: translateY(-2px); }
+        .btn-submit:hover { background: #00f2fe; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
 
-        .signup-link { text-align: center; margin-top: 25px; font-size: 0.9rem; }
-        .signup-link a { color: #fff; font-weight: 600; text-decoration: none; border-bottom: 1px solid transparent; transition: border 0.3s; }
-        .signup-link a:hover { border-bottom: 1px solid #fff; }
+        .signup-link { margin-top: 20px; font-size: 0.9rem; opacity: 0.9; }
+        .signup-link a { color: #fff; font-weight: 600; text-decoration: underline; }
     </style>
 </head>
 <body>
 
-    <div class="auth-card">
+    <div class="login-card">
         <h2>Welcome Back</h2>
-        <p class="subtitle">Log in to your account.</p>
-
+        <p>Log in to your account.</p>
+        
         <form id="login-form">
-            <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" placeholder="you@example.com" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" placeholder="Enter your password" required>
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" id="email" placeholder="name@example.com" required>
             </div>
             
-            <button type="submit" class="submit-btn">Log In</button>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submit-btn">Log In</button>
         </form>
 
         <div class="signup-link">
-            Don't have an account? <a href="index.html">Sign up here</a>
+            Don't have an account? <a href="signup.html">Sign up here</a>
         </div>
     </div>
 
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <script>
-        // Placeholder logic until Supabase Auth is fully connected
-        document.getElementById('login-form').addEventListener('submit', function(e) {
+        // Initialize Supabase (Ensure your project URL and anon key are filled in)
+        const SUPABASE_URL = 'https://ojpijxcqrfhvwgabkaww.supabase.co/rest/v1/';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9qcGlqeGNxcmZodndnYWJrYXd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxNzc5MDgsImV4cCI6MjEwMzc1MzkwOH0.kd0OPR0J8SzbHxibnqTWGlwBjIiDDAutT1KOqvACvRg';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
             e.preventDefault();
-            // We will add the Supabase login code here next.
-            alert("Login functionality will be connected shortly!");
+
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const submitBtn = document.getElementById('submit-btn');
+
+            submitBtn.innerText = "Logging in...";
+            submitBtn.style.opacity = "0.8";
+
+            try {
+                // 1. Authenticate user with Supabase Auth
+                const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (authError) throw authError;
+
+                // 2. Fetch user's role from the profiles table to route them correctly
+                const { data: profile, error: profileError } = await supabase
+                    .from('profiles')
+                    .select('role')
+                    .eq('id', authData.user.id)
+                    .single();
+
+                if (profileError) throw profileError;
+
+                // 3. Route based on role
+                if (profile.role === 'employer') {
+                    window.location.href = "employer-dashboard.html";
+                } else {
+                    window.location.href = "seeker-dashboard.html";
+                }
+
+            } catch (error) {
+                console.error("Login Error:", error);
+                alert(error.message || "Invalid login credentials. Please try again.");
+                submitBtn.innerText = "Log In";
+                submitBtn.style.opacity = "1";
+            }
         });
     </script>
 </body>
