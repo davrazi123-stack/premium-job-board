@@ -1,0 +1,12 @@
+{
+  "background_color": "#e939c6",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "premiumjobboard.netlify",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "premiumjobboard.netlify",
+  "start_url": "/",
+  "theme_color": "#1a6ebb",
+  "description": "A platform to get your dream job online"
+}
