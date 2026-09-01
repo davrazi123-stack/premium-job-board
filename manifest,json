@@ -1,0 +1,16 @@
+{
+  "name": "PremiumTalent Job Board",
+  "short_name": "Premium",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#4facfe",
+  "theme_color": "#4facfe",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
