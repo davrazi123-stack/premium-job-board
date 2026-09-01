@@ -163,27 +163,18 @@
             <button class="btn-search">Search</button>
         </div>
 
-        <div class="job-list">
-            <!-- Job Card 1 -->
-            <div class="job-card">
-                <div class="job-info">
-                    <h3>Senior Frontend Developer</h3>
-                    <div class="company-name">Acme Corp</div>
-                    <div class="job-tags"><span class="tag">Full-Time</span><span class="tag remote">Remote</span></div>
-                    <div class="job-salary">$1,200 - $1,800 / month</div>
-                </div>
+        <div class="dashboard-header">
+        <h1 id="welcome-message">Welcome!</h1>
+        <p>Find your next big opportunity.</p>
+    </div>
+
+    <!-- Empty grid waiting for real Supabase jobs -->
+    <div class="job-grid" id="job-grid">
+        
+    </div>
                 <!-- Notice the onclick function passing the job details -->
                 <button class="btn-apply" onclick="attemptApply('Senior Frontend Developer', 'Acme Corp')">1-Click Apply</button>
             </div>
-
-            <!-- Job Card 2 -->
-            <div class="job-card">
-                <div class="job-info">
-                    <h3>Digital Marketing Specialist</h3>
-                    <div class="company-name">ZimMedia Agencies</div>
-                    <div class="job-tags"><span class="tag">Contract</span><span class="tag">Bulawayo</span></div>
-                    <div class="job-salary">$800 - $1,000 / month</div>
-                </div>
                 <button class="btn-apply" onclick="attemptApply('Digital Marketing Specialist', 'ZimMedia Agencies')">1-Click Apply</button>
             </div>
         </div>
@@ -210,70 +201,88 @@
     <!-- Success Toast Notification -->
     <div class="toast" id="success-toast">✅ Application sent successfully!</div>
 
+   <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <script>
-        // 1. Subscription State (Simulating a database check)
-        let hasActiveSubscription = false; 
-        let pendingJob = "";
-        let pendingCompany = "";
+        // Initialize Supabase (Paste your actual keys here)
+        const SUPABASE_URL = 'https://[YOUR-PROJECT-ID].supabase.co';
+        const SUPABASE_ANON_KEY = '[YOUR-ANON-KEY]';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // 2. The 1-Click Apply Logic
-        function attemptApply(jobTitle, companyName) {
-            if (hasActiveSubscription) {
-                // If they already paid this month, it sends instantly
-                showToast(`Profile sent to ${companyName} for ${jobTitle}!`);
-            } else {
-                // If they haven't paid, open the paywall and remember what they clicked
-                pendingJob = jobTitle;
-                pendingCompany = companyName;
-                document.getElementById('paywall-modal').classList.add('active');
+        let currentUserProfile = null;
+
+        async function loadSeekerDashboard() {
+            // 1. Check if the user is logged in
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (!session) {
+                window.location.href = "login.html";
+                return;
             }
+
+            // 2. Fetch the seeker's profile (to get their full name)
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', session.user.id)
+                .single();
+
+            if (profile && profile.full_name) {
+                currentUserProfile = profile;
+                document.getElementById('welcome-message').innerText = `Welcome, ${profile.full_name}`;
+            }
+
+            // 3. Fetch all live jobs from the database
+            fetchJobs();
         }
 
-        function closeModal() {
-            document.getElementById('paywall-modal').classList.remove('active');
+        async function fetchJobs() {
+            const { data: jobs, error } = await supabase
+                .from('jobs')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error("Error fetching jobs:", error);
+                return;
+            }
+
+            const jobGrid = document.getElementById('job-grid');
+            jobGrid.innerHTML = ''; // Clear any loading text
+
+            if (jobs.length === 0) {
+                jobGrid.innerHTML = '<p>No vacancies available right now. Check back later!</p>';
+                return;
+            }
+
+            // Generate a card for each job
+            jobs.forEach(job => {
+                const jobCard = document.createElement('div');
+                jobCard.className = 'job-card'; // Use whatever class handles your glassmorphism card styling
+                jobCard.innerHTML = `
+                    <h3>${job.title}</h3>
+                    <p><strong>Company:</strong> ${job.company_name}</p>
+                    <p><strong>Location:</strong> ${job.location}</p>
+                    <p><strong>Salary:</strong> ${job.salary}</p>
+                    <button class="apply-btn" onclick="applyForJob('${job.id}')">1-Click Apply</button>
+                `;
+                jobGrid.appendChild(jobCard);
+            });
         }
 
-        // 3. UI for selecting a payment method
-        function selectPayment(btn) {
-            // Remove 'selected' class from all buttons, add to the clicked one
-            document.querySelectorAll('.pay-method-btn').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
+        async function applyForJob(jobId) {
+            // We will add the $5 Paynow check and application insertion here next!
+            alert(`Application process initiated for job ID: ${jobId}`);
         }
 
-        // 4. Processing the Payment (Simulated Paynow Gateway)
-        function processPayment() {
-            const checkoutBtn = document.querySelector('.btn-checkout');
-            checkoutBtn.innerText = "Processing via Paynow...";
-            checkoutBtn.style.opacity = "0.8";
-
-            setTimeout(() => {
-                // Payment Success!
-                hasActiveSubscription = true; // They are now subscribed for the month
-                
-                // Update UI to show they are premium
-                document.getElementById('sub-status').innerText = "Status: Premium (30 Days Left)";
-                document.getElementById('sub-status').style.color = "#00f2fe";
-
-                // Close modal and reset button
-                closeModal();
-                checkoutBtn.innerText = "Pay & Submit Application";
-                checkoutBtn.style.opacity = "1";
-
-                // Automatically submit the application they were trying to send
-                showToast(`Payment successful! Profile sent to ${pendingCompany}.`);
-            }, 1500);
+        async function logoutUser() {
+            await supabase.auth.signOut();
+            window.location.href = "index.html";
         }
 
-        // 5. Toast Notification System
-        function showToast(message) {
-            const toast = document.getElementById('success-toast');
-            toast.innerText = message;
-            toast.classList.add('show');
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3500); // Hide after 3.5 seconds
-        }
+        // Run immediately on page load
+        window.onload = loadSeekerDashboard;
     </script>
 </body>
 </html>
