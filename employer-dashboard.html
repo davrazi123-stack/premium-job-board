@@ -269,44 +269,43 @@
             btn.classList.add('selected');
         }
 
-        function processPayment() {
+ async function processPayment() {
             const checkoutBtn = document.querySelector('.btn-checkout');
-            checkoutBtn.innerText = "Processing via Paynow...";
+            checkoutBtn.innerText = "Connecting to Paynow...";
             checkoutBtn.style.opacity = "0.8";
 
-            setTimeout(() => {
-                hasActiveSubscription = true; 
-                document.getElementById('sub-status').innerText = "Status: Premium (30 Days Left)";
-                document.getElementById('sub-status').style.color = "#00f2fe";
+            // 1. Get the current logged-in user's details from Supabase
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (!session) {
+                alert("Session expired. Please log in again.");
+                window.location.href = "login.html";
+                return;
+            }
 
-                closePaywall();
+            try {
+                // 2. Call your secure Supabase Edge Function
+                const { data, error } = await supabase.functions.invoke('paynow-checkout', {
+                    body: { 
+                        user_id: session.user.id, 
+                        email: session.user.email 
+                    }
+                });
+
+                if (error) throw error;
+
+                // 3. Redirect the user to the official Paynow payment gateway
+                if (data && data.redirectUrl) {
+                    window.location.href = data.redirectUrl;
+                } else {
+                    throw new Error("No redirect URL received from Paynow");
+                }
+            } catch (error) {
+                console.error("Payment Error:", error);
+                alert("Failed to initiate payment. Please check your connection and try again.");
                 checkoutBtn.innerText = "Pay & Proceed";
                 checkoutBtn.style.opacity = "1";
-
-                executeAction(pendingAction);
-            }, 1500);
-        }
-
-        function executeAction(actionType) {
-            const applicantEmail = document.getElementById('modal-email').innerText;
-            
-            if (actionType === 'accept') {
-                showToast(`✅ Acceptance email sent to ${applicantEmail}.`);
-            } else if (actionType === 'reject') {
-                showToast(`❌ Rejection email sent to ${applicantEmail}.`);
             }
-
-            if (currentActiveTile) {
-                currentActiveTile.remove();
-            }
-            closeApplicantModal();
-        }
-
-        function showToast(message) {
-            const toast = document.getElementById('success-toast');
-            toast.innerText = message;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3500);
         }
     </script>
 </body>

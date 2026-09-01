@@ -163,21 +163,50 @@
 
     <!-- JAVASCRIPT FOR FORM SUBMISSION -->
     <script>
-        document.getElementById('vacancy-form').addEventListener('submit', function(e) {
-            e.preventDefault(); // Prevents the page from reloading instantly
+        document.getElementById('job-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const submitBtn = document.querySelector('.btn-checkout'); // or your submit button class
+    if (submitBtn) {
+        submitBtn.innerText = "Connecting to Paynow...";
+        submitBtn.style.opacity = "0.8";
+    }
 
-            // In a real application, this is where you would connect to Paynow/EcoCash.
-            // For now, we simulate a successful payment and post.
-            
-            const submitBtn = document.querySelector('.submit-btn');
-            submitBtn.innerText = "Processing Payment...";
-            submitBtn.style.opacity = "0.8";
+    // 1. Get the current logged-in user
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+        alert("Session expired. Please log in again.");
+        window.location.href = "login.html";
+        return;
+    }
 
-            setTimeout(() => {
-                alert("✅ Payment successful! Your job vacancy is now live on the board.");
-                window.location.href = "employer-dashboard.html"; // Redirect back to dashboard
-            }, 1500); // 1.5 second delay to simulate processing
+    try {
+        // 2. Call your secure Supabase Edge Function to initiate payment
+        const { data, error } = await supabase.functions.invoke('paynow-checkout', {
+            body: { 
+                user_id: session.user.id, 
+                email: session.user.email 
+            }
         });
+
+        if (error) throw error;
+
+        // 3. Redirect to official Paynow checkout
+        if (data && data.redirectUrl) {
+            window.location.href = data.redirectUrl;
+        } else {
+            throw new Error("No redirect URL received from Paynow");
+        }
+    } catch (error) {
+        console.error("Payment Error:", error);
+        alert("Failed to initiate payment. Please check your connection and try again.");
+        if (submitBtn) {
+            submitBtn.innerText = "Proceed to Payment";
+            submitBtn.style.opacity = "1";
+        }
+    }
+});
     </script>
 </body>
 </html>
