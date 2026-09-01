@@ -104,7 +104,7 @@
             <h2>Post a New Vacancy</h2>
             <p class="subtitle">Reach the best verified talent directly. Listings stay active for 30 days.</p>
 
-            <form id="vacancy-form">
+            <form id="job-form">
                 <div class="form-grid">
                     
                     <div class="form-group">
@@ -162,51 +162,66 @@
     </div>
 
     <!-- JAVASCRIPT FOR FORM SUBMISSION -->
+    <!-- 1. Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <script>
-        document.getElementById('job-form').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    const submitBtn = document.querySelector('.btn-checkout'); // or your submit button class
-    if (submitBtn) {
-        submitBtn.innerText = "Connecting to Paynow...";
-        submitBtn.style.opacity = "0.8";
-    }
+        // 2. Initialize Supabase (Paste your actual keys here!)
+        const SUPABASE_URL = 'https://ojpijxcqrfhvwgabkaww.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9qcGlqeGNxcmZodndnYWJrYXd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxNzc5MDgsImV4cCI6MjEwMzc1MzkwOH0.kd0OPR0J8SzbHxibnqTWGlwBjIiDDAutT1KOqvACvRg';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // 1. Get the current logged-in user
-    const { data: { session } } = await supabase.auth.getSession();
-    
-    if (!session) {
-        alert("Session expired. Please log in again.");
-        window.location.href = "login.html";
-        return;
-    }
+        // 3. Handle the form submission
+        const form = document.getElementById('job-form');
+        
+        if (form) {
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault(); // This stops the page from refreshing!
+                
+                const submitBtn = document.querySelector('.btn-checkout') || document.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.innerText = "Connecting to Paynow...";
+                    submitBtn.style.opacity = "0.8";
+                }
 
-    try {
-        // 2. Call your secure Supabase Edge Function to initiate payment
-        const { data, error } = await supabase.functions.invoke('paynow-checkout', {
-            body: { 
-                user_id: session.user.id, 
-                email: session.user.email 
-            }
-        });
+                // Get the current logged-in user
+                const { data: { session } } = await supabase.auth.getSession();
+                
+                if (!session) {
+                    alert("Session expired. Please log in again.");
+                    window.location.href = "login.html";
+                    return;
+                }
 
-        if (error) throw error;
+                try {
+                    // Call your secure Edge Function
+                    const { data, error } = await supabase.functions.invoke('paynow-checkout', {
+                        body: { 
+                            user_id: session.user.id, 
+                            email: session.user.email 
+                        }
+                    });
 
-        // 3. Redirect to official Paynow checkout
-        if (data && data.redirectUrl) {
-            window.location.href = data.redirectUrl;
+                    if (error) throw error;
+
+                    // Redirect to official Paynow checkout
+                    if (data && data.redirectUrl) {
+                        window.location.href = data.redirectUrl;
+                    } else {
+                        throw new Error("No redirect URL received.");
+                    }
+                } catch (error) {
+                    console.error("Payment Error:", error);
+                    alert("Failed to initiate payment. Check console for details.");
+                    if (submitBtn) {
+                        submitBtn.innerText = "Proceed to Payment";
+                        submitBtn.style.opacity = "1";
+                    }
+                }
+            });
         } else {
-            throw new Error("No redirect URL received from Paynow");
+            console.error("Could not find the form with id='job-form'");
         }
-    } catch (error) {
-        console.error("Payment Error:", error);
-        alert("Failed to initiate payment. Please check your connection and try again.");
-        if (submitBtn) {
-            submitBtn.innerText = "Proceed to Payment";
-            submitBtn.style.opacity = "1";
-        }
-    }
-});
     </script>
 </body>
 </html>
