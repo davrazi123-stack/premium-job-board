@@ -27,7 +27,7 @@
   "icons": [
     {
       "src": "/logo.png",
-      "sizes": "192x192",
+      "sizes": "438x438",
       "type": "image/png",
       "purpose": "any maskable"
     },
