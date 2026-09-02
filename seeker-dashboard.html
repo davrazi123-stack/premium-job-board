@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="logo.png">
+<meta name="theme-color" content="#4facfe">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Find Jobs | Premium Job Board</title>
@@ -272,5 +275,12 @@
         // Run immediately on page load
         window.onload = loadSeekerDashboard;
     </script>
+    <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+      .then(() => console.log("Service Worker registered successfully."))
+      .catch((err) => console.log("Service Worker registration failed:", err));
+  }
+</script>
 </body>
 </html>
