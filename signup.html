@@ -31,12 +31,14 @@
 
         .input-group { margin-bottom: 20px; text-align: left; }
         .input-group label { display: block; font-size: 0.85rem; margin-bottom: 6px; font-weight: 600; color: #475569; }
-        .input-group input, .input-group select {
+        .input-group input {
             width: 100%; padding: 10px 14px; border-radius: 8px;
             background: #ffffff; border: 1px solid #cbd5e1;
             color: #0f172a; font-size: 0.95rem; outline: none; transition: border-color 0.2s;
         }
-        .input-group input:focus, .input-group select:focus { border-color: #0f172a; }
+        .input-group input:focus { border-color: #0f172a; }
+
+        .helper-text { font-size: 0.75rem; color: #64748b; margin-top: 4px; display: block; }
 
         .btn-submit {
             width: 100%; padding: 12px; border-radius: 8px; font-size: 0.95rem; font-weight: 600;
@@ -66,10 +68,9 @@
             </div>
 
             <div class="input-group">
-                <label>I want to sign up as:</label>
-                <select id="role-select">
-                    <!-- Populated dynamically via JS -->
-                </select>
+                <label>Your Role</label>
+                <input type="text" id="role-input" required>
+                <span class="helper-text" id="helper-text"></span>
             </div>
 
             <div class="input-group">
@@ -102,48 +103,55 @@
         const portal = urlParams.get('portal') || 'employment';
 
         const badge = document.getElementById('portal-badge');
-        const roleSelect = document.getElementById('role-select');
+        const roleInput = document.getElementById('role-input');
+        const helperText = document.getElementById('helper-text');
         const loginRedirect = document.getElementById('login-redirect');
+
+        // Configure placeholders and allowed rules dynamically based on the portal
+        let allowedRoles = [];
 
         if (portal === 'housing') {
             badge.className = "badge badge-housing";
             badge.innerText = "Housing Portal";
             loginRedirect.href = `login.html?portal=housing`;
             
-            roleSelect.innerHTML = `
-                <option value="tenant">Tenant (Looking for a home)</option>
-                <option value="landlord">Landlord (Listing a property)</option>
-            `;
+            roleInput.placeholder = "landlord or tenant";
+            helperText.innerText = "Accepted roles: landlord, tenant";
+            allowedRoles = ['landlord', 'tenant'];
         } else {
             loginRedirect.href = `login.html?portal=employment`;
             
-            roleSelect.innerHTML = `
-                <option value="seeker">Job Seeker (Looking for work)</option>
-                <option value="employer">Employer (Posting vacancies)</option>
-            `;
+            roleInput.placeholder = "employer or seeker";
+            helperText.innerText = "Accepted roles: employer, seeker";
+            allowedRoles = ['employer', 'seeker'];
         }
 
         document.getElementById('signup-form').addEventListener('submit', async function(e) {
             e.preventDefault();
 
             const fullName = document.getElementById('full_name').value.trim();
-            const role = document.getElementById('role-select').value;
+            const typedRole = roleInput.value.trim().toLowerCase();
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const submitBtn = document.getElementById('submit-btn');
+
+            // Validate typed role
+            if (!allowedRoles.includes(typedRole)) {
+                alert(`Invalid role entered. For this portal, you must type one of: ${allowedRoles.join(', ')}.`);
+                return;
+            }
 
             submitBtn.innerText = "Creating account...";
             submitBtn.disabled = true;
 
             try {
-                // Sign up with Supabase Auth and pass metadata for database trigger
                 const { data, error } = await supabase.auth.signUp({
                     email: email,
                     password: password,
                     options: {
                         data: {
                             full_name: fullName,
-                            role: role
+                            role: typedRole
                         }
                     }
                 });
