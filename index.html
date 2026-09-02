@@ -1,156 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="manifest" href="/manifest.json">
-<link rel="apple-touch-icon" href="logo.png">
-<meta name="theme-color" content="#4facfe">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome | Discover Exceptional Talent</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
-    
+    <title>PremiumTalent & Housing Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        /* CSS RESET & BASE STYLES */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: #f8fafc; color: #0f172a; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        
+        .header { text-align: center; margin-bottom: 50px; }
+        .header h1 { font-size: 2.5rem; font-weight: 800; color: #1e293b; letter-spacing: -1px; }
+        .header p { color: #64748b; font-size: 1.1rem; margin-top: 10px; }
 
-        /* ANIMATED COLORFUL BACKGROUND */
-        body {
-            height: 100vh;
-            width: 100vw;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            /* A rich, royal, and vibrant gradient */
-            background: linear-gradient(-45deg, #4facfe, #00f2fe, #f093fb, #f5576c);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            overflow: hidden;
+        .split-container { display: flex; gap: 30px; width: 90%; max-width: 1000px; flex-wrap: wrap; }
+        
+        .card {
+            flex: 1; min-width: 300px; background: #ffffff; border-radius: 16px; padding: 50px 30px;
+            text-align: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        
+        /* Employment Styling */
+        .card.employment { border-top: 6px solid #3b82f6; }
+        .card.employment h2 { color: #3b82f6; }
+        
+        /* Housing Styling */
+        .card.housing { border-top: 6px solid #10b981; }
+        .card.housing h2 { color: #10b981; }
 
-        /* Background Animation Keyframes */
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* GLASSMORPHISM CARD */
-        .welcome-card {
-            background: rgba(255, 255, 255, 0.15); /* Semi-transparent white */
-            backdrop-filter: blur(15px); /* The frosted glass effect */
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 24px;
-            padding: 50px 40px;
-            max-width: 600px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
-            color: #ffffff;
-            transition: transform 0.3s ease;
-        }
-
-        .welcome-card:hover {
-            transform: translateY(-5px);
-        }
-
-        /* TYPOGRAPHY */
-        .welcome-card h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 15px;
-            letter-spacing: 1px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .welcome-card p {
-            font-size: 1.1rem;
-            font-weight: 400;
-            margin-bottom: 40px;
-            line-height: 1.6;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        }
-
-        /* BUTTON LAYOUT */
-        .button-container {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap; /* Allows buttons to stack on small mobile screens */
-        }
-
-        /* BUTTON STYLING */
+        .card h2 { font-size: 1.8rem; margin-bottom: 15px; font-weight: 800; }
+        .card p { color: #475569; line-height: 1.6; margin-bottom: 30px; }
+        
         .btn {
-            text-decoration: none;
-            padding: 15px 35px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            border-radius: 50px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            width: 220px;
+            display: inline-block; padding: 12px 30px; border-radius: 8px; font-weight: 600;
+            text-decoration: none; color: #fff; transition: background 0.2s;
         }
-
-        /* Employer Button - Royal Dark Theme */
-        .btn-employer {
-            background-color: #1a1a2e;
-            color: #ffffff;
-            border: 2px solid transparent;
-        }
-
-        .btn-employer:hover {
-            background-color: transparent;
-            border: 2px solid #1a1a2e;
-            color: #1a1a2e;
-            background-color: rgba(255, 255, 255, 0.9);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.4);
-        }
-
-        /* Seeker Button - Bright & Energetic Theme */
-        .btn-seeker {
-            background-color: #ffffff;
-            color: #f5576c;
-            border: 2px solid transparent;
-        }
-
-        .btn-seeker:hover {
-            background-color: transparent;
-            border: 2px solid #ffffff;
-            color: #ffffff;
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.4);
-        }
-
-        /* MOBILE RESPONSIVENESS */
-        @media (max-width: 600px) {
-            .welcome-card h1 {
-                font-size: 2rem;
-            }
-            .btn {
-                width: 100%; /* Make buttons full width on small screens */
-            }
-        }
+        .btn-blue { background: #3b82f6; }
+        .btn-blue:hover { background: #2563eb; }
+        .btn-green { background: #10b981; }
+        .btn-green:hover { background: #059669; }
     </style>
 </head>
 <body>
 
-    <div class="welcome-card">
-        <h1>Welcome to the Future.</h1>
-        <p>A warm welcome to our platform. Whether you are building an elite team or searching for your dream role, your next great chapter begins right here. Tell us who you are to begin.</p>
-        
-        <div class="button-container">
-            <a href="signup.html?type=employer" class="btn btn-employer">I am an Employer</a>
-            <a href="signup.html?type=seeker" class="btn btn-seeker">I am a Job Seeker</a>
+    <div class="header">
+        <h1>Welcome to the Premium Portal</h1>
+        <p>Select a portal to continue to your dashboard.</p>
+    </div>
+
+    <div class="split-container">
+        <!-- Employment Portal -->
+        <div class="card employment" onclick="window.location.href='login.html?portal=employment'">
+            <h2>Employment</h2>
+            <p>Find premium job vacancies or hire top-tier talent. Connect instantly with secure verified profiles.</p>
+            <a href="login.html?portal=employment" class="btn btn-blue">Enter Job Board</a>
+        </div>
+
+        <!-- Housing Portal -->
+        <div class="card housing" onclick="window.location.href='login.html?portal=housing'">
+            <h2>Housing</h2>
+            <p>List your property or find your next family home. Secure applications and strict tenant verification.</p>
+            <a href="login.html?portal=housing" class="btn btn-green">Enter Housing</a>
         </div>
     </div>
- 
+
 </body>
 </html>
