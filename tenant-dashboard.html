@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tenant Dashboard | Premium Housing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: #f8fafc; color: #0f172a; }
+
+        /* Navigation */
+        nav {
+            background: #ffffff; border-bottom: 1px solid #e2e8f0;
+            padding: 15px 40px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .nav-brand { font-size: 1.25rem; font-weight: 700; color: #10b981; }
+        .nav-links { display: flex; align-items: center; gap: 20px; }
+        .nav-links span { font-size: 0.9rem; font-weight: 600; color: #059669; background: #d1fae5; padding: 6px 12px; border-radius: 6px; }
+        .nav-links a { color: #64748b; text-decoration: none; font-weight: 500; transition: color 0.2s; }
+        .nav-links a:hover { color: #0f172a; }
+
+        /* Main Container */
+        .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+        .header-section { margin-bottom: 30px; }
+        .header-section h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 8px; }
+        .header-section p { color: #64748b; }
+
+        /* Subscription Banner */
+        .sub-banner {
+            background: #ffffff; border: 1px solid #cbd5e1; border-radius: 12px;
+            padding: 25px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .sub-banner h3 { font-size: 1.1rem; margin-bottom: 5px; color: #1e293b; }
+        .sub-banner p { font-size: 0.9rem; color: #64748b; }
+
+        /* Property Grid */
+        .section-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 20px; color: #1e293b; }
+        .property-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+        
+        .property-card {
+            background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px;
+            padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .property-card h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; color: #1e293b; }
+        .property-card .price { font-size: 1.35rem; font-weight: 800; color: #10b981; margin-bottom: 12px; }
+        .property-card p { font-size: 0.9rem; color: #475569; margin-bottom: 6px; }
+        .property-card .desc { margin: 12px 0; color: #64748b; font-size: 0.875rem; line-height: 1.5; }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.9rem;
+            border: none; cursor: pointer; transition: background 0.2s; text-align: center; width: 100%;
+        }
+        .btn-primary { background: #10b981; color: #ffffff; }
+        .btn-primary:hover { background: #059669; }
+        .btn-dark { background: #0f172a; color: #ffffff; width: auto; }
+        .btn-dark:hover { background: #334155; }
+
+        /* Modal Overlay */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.6); justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-content {
+            background: #ffffff; border-radius: 12px; padding: 30px; width: 100%; max-width: 500px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); position: relative;
+        }
+        .modal-content h2 { margin-bottom: 20px; font-size: 1.25rem; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: #475569; }
+        .form-group input {
+            width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px;
+            font-size: 0.95rem; outline: none;
+        }
+        .form-group input:focus { border-color: #10b981; }
+        .close-btn { position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 1.25rem; cursor: pointer; color: #64748b; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-brand">Tenant Portal</div>
+        <div class="nav-links">
+            <span id="sub-badge">Status: Free Tier</span>
+            <a href="#" onclick="logoutUser()">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header-section">
+            <h1 id="welcome-message">Find Your Next Home</h1>
+            <p>Browse published housing listings and submit verified family applications.</p>
+        </div>
+
+        <!-- Subscription Upgrade Section -->
+        <div class="sub-banner" id="upgrade-banner">
+            <div>
+                <h3>Unlock Unlimited Applications</h3>
+                <p>Pay $20/month via Paynow to apply for as many properties as you need.</p>
+            </div>
+            <button class="btn btn-dark" onclick="buyTenantSubscription()">Upgrade for $20</button>
+        </div>
+
+        <div class="section-title">Available Properties for Rent</div>
+        <div class="property-grid" id="property-grid">
+            <!-- Properties injected dynamically -->
+        </div>
+    </div>
+
+    <!-- Application Modal -->
+    <div class="modal" id="apply-modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <h2>Tenant Application Form</h2>
+            <form id="application-form">
+                <input type="hidden" id="selected-house-id">
+                <div class="form-group">
+                    <label>Family Name</label>
+                    <input type="text" id="family_name" placeholder="e.g., The Ngirazi Family" required>
+                </div>
+                <div class="form-group">
+                    <label>Number of Family Members</label>
+                    <input type="number" id="number_of_members" placeholder="4" required>
+                </div>
+                <div class="form-group">
+                    <label>Occupation of Head of Family</label>
+                    <input type="text" id="head_occupation" placeholder="e.g., Health Consultant" required>
+                </div>
+                <div class="form-group">
+                    <label>Notification Email</label>
+                    <input type="email" id="notification_email" placeholder="name@example.com" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Submit Application</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        const SUPABASE_URL = 'https://[YOUR-PROJECT-ID].supabase.co';
+        const SUPABASE_ANON_KEY = '[YOUR-ANON-KEY]';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let currentUser = null;
+
+        async function loadTenantDashboard() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                window.location.href = "login.html";
+                return;
+            }
+            currentUser = session.user;
+
+            // Fetch profile status to check housing subscription
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', currentUser.id)
+                .single();
+
+            if (profile) {
+                if (profile.full_name) {
+                    document.getElementById('welcome-message').innerText = `Welcome, ${profile.full_name}`;
+                }
+                if (profile.housing_subscription_status === 'active') {
+                    document.getElementById('sub-badge').innerText = "Status: Unlimited Active";
+                    document.getElementById('sub-badge').style.background = "#d1fae5";
+                    document.getElementById('upgrade-banner').style.display = 'none';
+                }
+            }
+
+            fetchPublishedHouses();
+        }
+
+        async function fetchPublishedHouses() {
+            const { data: houses, error } = await supabase
+                .from('houses')
+                .select('*')
+                .eq('is_published', true)
+                .order('created_at', { ascending: false });
+
+            if (error) return console.error(error);
+
+            const grid = document.getElementById('property-grid');
+            grid.innerHTML = '';
+
+            if (houses.length === 0) {
+                grid.innerHTML = '<p style="color: #64748b;">No properties available for rent right now.</p>';
+                return;
+            }
+
+            houses.forEach(house => {
+                grid.innerHTML += `
+                    <div class="property-card">
+                        <div>
+                            <h3>${house.title}</h3>
+                            <div class="price">$${house.rent_fee} / month</div>
+                            <p><strong>Location:</strong> ${house.location}</p>
+                            <p><strong>Max Members:</strong> Up to ${house.max_members} people</p>
+                            <p class="desc">${house.description}</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="openApplyModal('${house.id}')">Apply Now</button>
+                    </div>
+                `;
+            });
+        }
+
+        function openApplyModal(houseId) {
+            document.getElementById('selected-house-id').value = houseId;
+            document.getElementById('notification_email').value = currentUser.email;
+            document.getElementById('apply-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('apply-modal').style.display = 'none';
+        }
+
+        // Handle Tenant Application Submission
+        document.getElementById('application-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Verify subscription status before allowing submission
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('housing_subscription_status')
+                .eq('id', currentUser.id)
+                .single();
+
+            if (!profile || profile.housing_subscription_status !== 'active') {
+                alert("You need an active $20/month unlimited subscription to apply for properties.");
+                return;
+            }
+
+            const application = {
+                house_id: document.getElementById('selected-house-id').value,
+                tenant_id: currentUser.id,
+                family_name: document.getElementById('family_name').value,
+                number_of_members: parseInt(document.getElementById('number_of_members').value),
+                head_occupation: document.getElementById('head_occupation').value,
+                notification_email: document.getElementById('notification_email').value
+            };
+
+            const { error } = await supabase.from('tenant_applications').insert([application]);
+
+            if (error) {
+                alert("Error submitting application: " + error.message);
+            } else {
+                alert("Application submitted successfully to the landlord!");
+                closeModal();
+                document.getElementById('application-form').reset();
+            }
+        });
+
+        async function buyTenantSubscription() {
+            try {
+                const { data, error } = await supabase.functions.invoke('paynow-checkout', {
+                    body: { 
+                        user_id: currentUser.id, 
+                        email: currentUser.email,
+                        amount: 20.00,
+                        type: 'housing_subscription',
+                        plan_name: 'Housing Unlimited Plan'
+                    }
+                });
+
+                if (error) throw error;
+                if (data && data.redirectUrl) {
+                    window.location.href = data.redirectUrl;
+                }
+            } catch (err) {
+                console.error("Payment error:", err);
+                alert("Could not initialize payment. Please try again.");
+            }
+        }
+
+        async function logoutUser() {
+            await supabase.auth.signOut();
+            window.location.href = "index.html";
+        }
+
+        window.onload = loadTenantDashboard;
+    </script>
+</body>
+</html>

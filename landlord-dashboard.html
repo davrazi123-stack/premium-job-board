@@ -217,16 +217,35 @@
         }
 
         async function payToPublish(houseId) {
-            alert("Connecting to Paynow for house ID: " + houseId);
-            // Paynow edge function integration will go here
-        }
+    const btnElement = event.target;
+    btnElement.innerText = "Connecting to Paynow...";
+    btnElement.style.opacity = "0.8";
+    btnElement.disabled = true;
 
-        async function logoutUser() {
-            await supabase.auth.signOut();
-            window.location.href = "index.html";
-        }
+    try {
+        const { data, error } = await supabase.functions.invoke('paynow-checkout', {
+            body: { 
+                house_id: houseId, 
+                amount: 20.00,
+                type: 'housing'
+            }
+        });
 
-        window.onload = loadDashboard;
+        if (error) throw error;
+
+        if (data && data.redirectUrl) {
+            window.location.href = data.redirectUrl;
+        } else {
+            throw new Error("No redirect URL received from Paynow");
+        }
+    } catch (error) {
+        console.error("Payment Error:", error);
+        alert("Failed to initiate payment. Please try again.");
+        btnElement.innerText = "Pay $20 to Publish";
+        btnElement.style.opacity = "1";
+        btnElement.disabled = false;
+    }
+}
     </script>
 </body>
 </html>
