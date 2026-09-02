@@ -55,13 +55,13 @@
         .btn-pay { background: #0f172a; color: #ffffff; font-size: 0.875rem; padding: 8px 16px; margin-top: 15px;}
         .btn-pay:hover { background: #334155; }
 
-        /* Property List */
+        /* List Styling */
         .property-list { display: grid; gap: 20px; }
         .property-item {
             border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px;
-            display: flex; justify-content: space-between; align-items: center;
+            display: flex; justify-content: space-between; align-items: center; background: #ffffff;
         }
-        .property-details h3 { font-size: 1.1rem; margin-bottom: 5px; }
+        .property-details h3 { font-size: 1.1rem; margin-bottom: 5px; color: #1e293b; }
         .property-details p { font-size: 0.9rem; color: #64748b; }
         .status-badge {
             display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: 0.75rem; font-weight: 600;
@@ -73,7 +73,7 @@
 <body>
 
     <nav>
-        <div class="nav-brand">Housing Portal</div>
+        <div class="nav-brand">Housing Portal | Landlord</div>
         <div class="nav-links">
             <a href="#" onclick="logoutUser()">Logout</a>
         </div>
@@ -82,7 +82,7 @@
     <div class="container">
         <div class="header-section">
             <h1 id="welcome-message">Landlord Dashboard</h1>
-            <p>Manage your properties and review tenant applications.</p>
+            <p>Manage your properties and review incoming tenant applications.</p>
         </div>
 
         <!-- Add New Property Form -->
@@ -123,7 +123,15 @@
         <div class="card">
             <h2>My Properties</h2>
             <div class="property-list" id="property-list">
-                <!-- Properties will be injected here via JavaScript -->
+                <!-- Properties injected via JS -->
+            </div>
+        </div>
+
+        <!-- Tenant Applications Review Section -->
+        <div class="card">
+            <h2>Tenant Applications</h2>
+            <div class="property-list" id="applications-list">
+                <!-- Applications injected via JS -->
             </div>
         </div>
     </div>
@@ -132,7 +140,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <script>
-        // Initialize Supabase
         const SUPABASE_URL = 'https://[YOUR-PROJECT-ID].supabase.co';
         const SUPABASE_ANON_KEY = '[YOUR-ANON-KEY]';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -141,11 +148,24 @@
         async function loadDashboard() {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) {
-                window.location.href = "login.html";
+                window.location.href = "login.html?portal=housing";
                 return;
             }
             currentUserId = session.user.id;
+
+            // Fetch landlord profile name
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('full_name')
+                .eq('id', currentUserId)
+                .single();
+
+            if (profile && profile.full_name) {
+                document.getElementById('welcome-message').innerText = `Welcome, ${profile.full_name}`;
+            }
+
             fetchProperties();
+            fetchApplications();
         }
 
         // Save a new property
@@ -159,7 +179,7 @@
                 max_members: parseInt(document.getElementById('max_members').value),
                 location: document.getElementById('location').value,
                 description: document.getElementById('description').value,
-                is_published: false // Requires payment to publish
+                is_published: false
             };
 
             const { error } = await supabase.from('houses').insert([newProperty]);
@@ -167,13 +187,13 @@
             if (error) {
                 alert("Error saving property: " + error.message);
             } else {
-                alert("Property saved as a draft!");
+                alert("Property saved as a draft! Click 'Pay $20 to Publish' to make it live.");
                 document.getElementById('property-form').reset();
                 fetchProperties();
             }
         });
 
-        // Fetch and display properties
+        // Fetch properties
         async function fetchProperties() {
             const { data: houses, error } = await supabase
                 .from('houses')
@@ -216,36 +236,124 @@
             });
         }
 
-        async function payToPublish(houseId) {
-    const btnElement = event.target;
-    btnElement.innerText = "Connecting to Paynow...";
-    btnElement.style.opacity = "0.8";
-    btnElement.disabled = true;
+        // Fetch applications for landlord's houses
+        async function fetchApplications() {
+            // 1. Get all house IDs owned by this landlord
+            const { data: houses } = await supabase
+                .from('houses')
+                .select('id, title')
+                .eq('landlord_id', currentUserId);
 
-    try {
-        const { data, error } = await supabase.functions.invoke('paynow-checkout', {
-            body: { 
-                house_id: houseId, 
-                amount: 20.00,
-                type: 'housing'
+            if (!houses || houses.length === 0) {
+                document.getElementById('applications-list').innerHTML = '<p style="color: #64748b;">No properties listed to receive applications.</p>';
+                return;
             }
-        });
 
-        if (error) throw error;
+            const houseIds = houses.map(h => h.id);
+            const houseMap = {};
+            houses.forEach(h => houseMap[h.id] = h.title);
 
-        if (data && data.redirectUrl) {
-            window.location.href = data.redirectUrl;
-        } else {
-            throw new Error("No redirect URL received from Paynow");
+            // 2. Fetch applications matching these house IDs
+            const { data: apps, error } = await supabase
+                .from('tenant_applications')
+                .select('*')
+                .in('house_id', houseIds)
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error("Error fetching applications:", error);
+                return;
+            }
+
+            const appList = document.getElementById('applications-list');
+            appList.innerHTML = '';
+
+            if (!apps || apps.length === 0) {
+                appList.innerHTML = '<p style="color: #64748b;">No tenant applications received yet.</p>';
+                return;
+            }
+
+            apps.forEach(app => {
+                const propertyTitle = houseMap[app.house_id] || 'Property';
+                const status = app.status || 'pending';
+                const statusColor = status === 'accepted' ? '#059669' : status === 'rejected' ? '#dc2626' : '#d97706';
+                const statusBg = status === 'accepted' ? '#d1fae5' : status === 'rejected' ? '#fee2e2' : '#fef3c7';
+
+                appList.innerHTML += `
+                    <div class="property-item" style="flex-direction: column; align-items: flex-start; gap: 12px;">
+                        <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                            <div>
+                                <h3 style="font-size: 1.15rem; color: #1e293b;">${app.family_name}</h3>
+                                <p style="font-size: 0.85rem; color: #64748b; margin-top: 2px;">Applied for: <strong>${propertyTitle}</strong></p>
+                            </div>
+                            <span class="status-badge" style="background: ${statusBg}; color: ${statusColor};">${status.toUpperCase()}</span>
+                        </div>
+                        
+                        <div style="font-size: 0.9rem; color: #475569; width: 100%; border-top: 1px solid #f1f5f9; padding-top: 10px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px;">
+                            <p><strong>Family Members:</strong> ${app.number_of_members}</p>
+                            <p><strong>Head Occupation:</strong> ${app.head_occupation}</p>
+                            <p><strong>Email:</strong> <a href="mailto:${app.notification_email}" style="color: #10b981; text-decoration: none;">${app.notification_email}</a></p>
+                        </div>
+
+                        <div style="display: flex; gap: 10px; margin-top: 5px;">
+                            <button class="btn" style="background: #10b981; color: white; padding: 6px 16px; font-size: 0.85rem;" onclick="updateAppStatus('${app.id}', 'accepted')">Accept</button>
+                            <button class="btn" style="background: #ef4444; color: white; padding: 6px 16px; font-size: 0.85rem;" onclick="updateAppStatus('${app.id}', 'rejected')">Reject</button>
+                        </div>
+                    </div>
+                `;
+            });
         }
-    } catch (error) {
-        console.error("Payment Error:", error);
-        alert("Failed to initiate payment. Please try again.");
-        btnElement.innerText = "Pay $20 to Publish";
-        btnElement.style.opacity = "1";
-        btnElement.disabled = false;
-    }
-}
+
+        async function updateAppStatus(appId, newStatus) {
+            const { error } = await supabase
+                .from('tenant_applications')
+                .update({ status: newStatus })
+                .eq('id', appId);
+
+            if (error) {
+                alert("Error updating application: " + error.message);
+            } else {
+                fetchApplications();
+            }
+        }
+
+        async function payToPublish(houseId) {
+            const btnElement = event.target;
+            btnElement.innerText = "Connecting to Paynow...";
+            btnElement.style.opacity = "0.8";
+            btnElement.disabled = true;
+
+            try {
+                const { data, error } = await supabase.functions.invoke('paynow-checkout', {
+                    body: { 
+                        house_id: houseId, 
+                        amount: 20.00,
+                        type: 'housing'
+                    }
+                });
+
+                if (error) throw error;
+
+                if (data && data.redirectUrl) {
+                    window.location.href = data.redirectUrl;
+                } else {
+                    throw new Error("No redirect URL received from Paynow");
+                }
+            } catch (error) {
+                console.error("Payment Error:", error);
+                alert("Failed to initiate payment. Please try again.");
+                btnElement.innerText = "Pay $20 to Publish";
+                btnElement.style.opacity = "1";
+                btnElement.disabled = false;
+            }
+        }
+
+        async function logoutUser() {
+            await supabase.auth.signOut();
+            window.location.href = "index.html";
+        }
+
+        window.onload = loadDashboard;
     </script>
 </body>
 </html>
