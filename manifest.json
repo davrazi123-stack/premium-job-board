@@ -2,11 +2,25 @@
   "background_color": "#e939c6",
   "dir": "ltr",
   "display": "standalone",
-  "name": "premiumjobboard.netlify",
+  "name": "PremiumTalent Job Board",
   "orientation": "any",
   "scope": "/",
-  "short_name": "premiumjobboard.netlify",
+  "short_name": "PremiumTalent",
   "start_url": "/",
   "theme_color": "#1a6ebb",
-  "description": "A platform to get your dream job online"
+  "description": "A platform to get your dream job online",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
 }
