@@ -7,11 +7,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* Modern Flat Design */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background-color: #f8fafc; color: #0f172a; }
 
-        /* Navigation */
         nav {
             background: #ffffff; border-bottom: 1px solid #e2e8f0;
             padding: 15px 40px; display: flex; justify-content: space-between; align-items: center;
@@ -20,20 +18,17 @@
         .nav-links a { color: #64748b; text-decoration: none; font-weight: 500; transition: color 0.2s; }
         .nav-links a:hover { color: #0f172a; }
 
-        /* Main Container */
         .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
         .header-section { margin-bottom: 30px; }
         .header-section h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 8px; }
         .header-section p { color: #64748b; }
 
-        /* Flat Cards */
         .card {
             background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px;
             padding: 30px; margin-bottom: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         .card h2 { font-size: 1.25rem; margin-bottom: 20px; color: #1e293b; }
 
-        /* Form Styling */
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 8px; color: #475569; }
         .form-group input, .form-group textarea {
@@ -45,7 +40,6 @@
         .form-row { display: flex; gap: 20px; }
         .form-row .form-group { flex: 1; }
 
-        /* Buttons */
         .btn {
             padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 1rem;
             border: none; cursor: pointer; transition: background 0.2s; text-align: center;
@@ -55,7 +49,6 @@
         .btn-pay { background: #0f172a; color: #ffffff; font-size: 0.875rem; padding: 8px 16px; margin-top: 15px;}
         .btn-pay:hover { background: #334155; }
 
-        /* List Styling */
         .property-list { display: grid; gap: 20px; }
         .property-item {
             border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px;
@@ -105,9 +98,15 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label>Location / Address</label>
-                    <input type="text" id="location" placeholder="e.g., 123 Main St, Bulawayo" required>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Location / Address</label>
+                        <input type="text" id="location" placeholder="e.g., 123 Main St, Bulawayo" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Contact Phone Number (Private)</label>
+                        <input type="text" id="landlord_phone" placeholder="e.g., +263 77 123 4567" required>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -122,23 +121,17 @@
         <!-- My Properties List -->
         <div class="card">
             <h2>My Properties</h2>
-            <div class="property-list" id="property-list">
-                <!-- Properties injected via JS -->
-            </div>
+            <div class="property-list" id="property-list"></div>
         </div>
 
         <!-- Tenant Applications Review Section -->
         <div class="card">
             <h2>Tenant Applications</h2>
-            <div class="property-list" id="applications-list">
-                <!-- Applications injected via JS -->
-            </div>
+            <div class="property-list" id="applications-list"></div>
         </div>
     </div>
 
-    <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
     <script>
         const SUPABASE_URL = 'https://[YOUR-PROJECT-ID].supabase.co';
         const SUPABASE_ANON_KEY = '[YOUR-ANON-KEY]';
@@ -153,7 +146,6 @@
             }
             currentUserId = session.user.id;
 
-            // Fetch landlord profile name
             const { data: profile } = await supabase
                 .from('profiles')
                 .select('full_name')
@@ -168,7 +160,6 @@
             fetchApplications();
         }
 
-        // Save a new property
         document.getElementById('property-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -178,6 +169,7 @@
                 rent_fee: parseFloat(document.getElementById('rent_fee').value),
                 max_members: parseInt(document.getElementById('max_members').value),
                 location: document.getElementById('location').value,
+                landlord_phone: document.getElementById('landlord_phone').value,
                 description: document.getElementById('description').value,
                 is_published: false
             };
@@ -193,7 +185,6 @@
             }
         });
 
-        // Fetch properties
         async function fetchProperties() {
             const { data: houses, error } = await supabase
                 .from('houses')
@@ -225,7 +216,7 @@
                     <div class="property-item">
                         <div class="property-details">
                             <h3>${house.title}</h3>
-                            <p>${house.location} • $${house.rent_fee}/mo • Max ${house.max_members} people</p>
+                            <p>${house.location} • $${house.rent_fee}/mo • Phone: ${house.landlord_phone || 'N/A'}</p>
                             <div style="margin-top: 10px;">
                                 <span class="status-badge ${badgeClass}">${badgeText}</span>
                             </div>
@@ -236,9 +227,7 @@
             });
         }
 
-        // Fetch applications for landlord's houses
         async function fetchApplications() {
-            // 1. Get all house IDs owned by this landlord
             const { data: houses } = await supabase
                 .from('houses')
                 .select('id, title')
@@ -253,17 +242,13 @@
             const houseMap = {};
             houses.forEach(h => houseMap[h.id] = h.title);
 
-            // 2. Fetch applications matching these house IDs
             const { data: apps, error } = await supabase
                 .from('tenant_applications')
                 .select('*')
                 .in('house_id', houseIds)
                 .order('created_at', { ascending: false });
 
-            if (error) {
-                console.error("Error fetching applications:", error);
-                return;
-            }
+            if (error) return console.error(error);
 
             const appList = document.getElementById('applications-list');
             appList.innerHTML = '';
@@ -292,7 +277,7 @@
                         <div style="font-size: 0.9rem; color: #475569; width: 100%; border-top: 1px solid #f1f5f9; padding-top: 10px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px;">
                             <p><strong>Family Members:</strong> ${app.number_of_members}</p>
                             <p><strong>Head Occupation:</strong> ${app.head_occupation}</p>
-                            <p><strong>Email:</strong> <a href="mailto:${app.notification_email}" style="color: #10b981; text-decoration: none;">${app.notification_email}</a></p>
+                            <p><strong>Email:</strong> ${app.notification_email}</p>
                         </div>
 
                         <div style="display: flex; gap: 10px; margin-top: 5px;">
@@ -305,45 +290,24 @@
         }
 
         async function updateAppStatus(appId, newStatus) {
-            const { error } = await supabase
-                .from('tenant_applications')
-                .update({ status: newStatus })
-                .eq('id', appId);
-
-            if (error) {
-                alert("Error updating application: " + error.message);
-            } else {
-                fetchApplications();
-            }
+            const { error } = await supabase.from('tenant_applications').update({ status: newStatus }).eq('id', appId);
+            if (error) alert("Error: " + error.message);
+            else fetchApplications();
         }
 
         async function payToPublish(houseId) {
             const btnElement = event.target;
             btnElement.innerText = "Connecting to Paynow...";
-            btnElement.style.opacity = "0.8";
             btnElement.disabled = true;
-
             try {
                 const { data, error } = await supabase.functions.invoke('paynow-checkout', {
-                    body: { 
-                        house_id: houseId, 
-                        amount: 20.00,
-                        type: 'housing'
-                    }
+                    body: { house_id: houseId, amount: 20.00, type: 'housing' }
                 });
-
                 if (error) throw error;
-
-                if (data && data.redirectUrl) {
-                    window.location.href = data.redirectUrl;
-                } else {
-                    throw new Error("No redirect URL received from Paynow");
-                }
+                if (data && data.redirectUrl) window.location.href = data.redirectUrl;
             } catch (error) {
-                console.error("Payment Error:", error);
-                alert("Failed to initiate payment. Please try again.");
+                alert("Failed to initiate payment.");
                 btnElement.innerText = "Pay $20 to Publish";
-                btnElement.style.opacity = "1";
                 btnElement.disabled = false;
             }
         }
